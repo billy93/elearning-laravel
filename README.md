@@ -1,58 +1,160 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# E-Learning App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A simple fullstack e-learning application built with Laravel, SQLite, and Tailwind CSS.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   Role-based login (`admin` and `student`)
+-   Admin dashboard with learning statistics
+-   Admin CRUD for learning materials (`video` and `text`)
+-   Student access to published materials after login
+-   Public landing page for non-authenticated users
+-   SQLite file database for easy local setup
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   Laravel 13
+-   PHP 8.3+
+-   SQLite
+-   Tailwind CSS (via Vite)
+-   PM2 (process management)
+-   Cloudflare Tunnel (optional deployment)
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## 1) Clone the Repository
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone git@github.com:billy93/elearning-laravel.git
+cd elearning-laravel
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## 2) Install Dependencies
 
-## Contributing
+Install backend and frontend dependencies:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+npm install
+```
 
-## Code of Conduct
+## 3) Configure Environment
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Create environment file:
 
-## Security Vulnerabilities
+```bash
+cp .env.example .env
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Create SQLite database file:
 
-## License
+```bash
+touch database/database.sqlite
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The default `.env.example` is already configured for SQLite.
+
+## 4) Generate App Key
+
+```bash
+php artisan key:generate
+```
+
+## 5) Run Database Migration + Seed
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+This command will create tables and insert demo users + materials.
+
+## 6) Build Frontend Assets
+
+```bash
+npm run build
+```
+
+For development mode, use:
+
+```bash
+npm run dev
+```
+
+## 7) Run the Application Locally
+
+```bash
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+Open:
+
+`http://127.0.0.1:8000`
+
+## 8) Demo Accounts
+
+-   Admin
+
+    -   Email: `admin@elearning.test`
+    -   Password: `password123`
+
+-   Student
+    -   Email: `student@elearning.test`
+    -   Password: `password123`
+
+## 9) Run with PM2 (Production-like)
+
+If you want to keep the app running in the background:
+
+```bash
+pm2 start ecosystem.config.cjs
+pm2 save
+pm2 status
+```
+
+Restart app:
+
+```bash
+pm2 restart elearning-laravel
+```
+
+## 10) Optional: Expose with Cloudflare Tunnel
+
+Login and create tunnel:
+
+```bash
+cloudflared tunnel login
+cloudflared tunnel create elearning-laravel
+```
+
+Add DNS route:
+
+```bash
+cloudflared tunnel route dns elearning-laravel elearning-laravel.andreasbilly.com
+```
+
+Run tunnel:
+
+```bash
+cloudflared tunnel --config deploy/cloudflared-config.yml run elearning-laravel
+```
+
+Or run tunnel with PM2:
+
+```bash
+pm2 start bash --name elearning-cloudflared -- -lc "cloudflared tunnel --config /home/development/apps/elearning/deploy/cloudflared-config.yml run elearning-laravel"
+pm2 save
+```
+
+## Notes
+
+-   If `npm run build` fails due optional dependency issue, reinstall Node modules:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+-   If you need a clean DB reset:
+
+```bash
+php artisan migrate:fresh --seed
+```
