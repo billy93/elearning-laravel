@@ -1,0 +1,7 @@
+tunnel: elearning-laravel
+credentials-file: /home/development/.cloudflared/5d54db6a-47f2-437c-8efa-cc251235eb7c.json
+
+ingress:
+  - hostname: elearning-laravel.andreasbilly.com
+    service: http://127.0.0.1:8000
+  - service: http_status:404
